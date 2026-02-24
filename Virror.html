@@ -1,0 +1,2501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virror</title>
+    <style>
+        /* Полное обнуление, без скролла */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background-color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, 'Lucida Grande', 'DejaVu Sans', 'Bitstream Vera Sans', Verdana, sans-serif;
+        }
+
+        body {
+            color: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Контейнер с текстом — ровно по центру экрана, но поднят выше */
+        .centered-higher {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -350%);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            z-index: 5;
+        }
+
+        .error-code {
+            font-size: 32px;
+            font-weight: 500;
+            line-height: 1.2;
+            margin-bottom: 6px;
+            user-select: text;
+        }
+        
+        .error-number {
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            transform-origin: center center;
+            min-width: 24px;
+            text-align: center;
+            user-select: text;
+        }
+        
+        .error-number.finished {
+            cursor: default;
+            transition: none;
+            transform: none !important;
+            user-select: text;
+        }
+
+        .support-line {
+            font-size: 14px;
+            font-weight: 400;
+            user-select: text;
+        }
+        
+        /* Специальный стиль для кликабельных слов (here), но без выделения */
+        .clickable-word {
+            cursor: pointer;
+            display: inline-block;
+            color: inherit;
+            text-decoration: none;
+            font-weight: inherit;
+        }
+        
+        .clickable-word:hover {
+            cursor: pointer;
+        }
+
+        /* Белый текст чуть ниже - для GMPXFS (Error 4) */
+        .white-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -800%);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            z-index: 20;
+            pointer-events: none;
+            user-select: text;
+        }
+        
+        /* Белый текст для Error 5 (MORSE) */
+        .morse-white-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -400%);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            z-index: 25;
+            pointer-events: auto;
+            user-select: text;
+            padding: 10px 0;
+            cursor: text;
+        }
+
+        /* Белый текст для Error 1 (Xzkgxsz) */
+        .error1-white-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -300%);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            z-index: 25;
+            pointer-events: auto;
+            user-select: text;
+            padding: 15px 0;
+            cursor: text;
+            background-color: transparent;
+        }
+
+        /* Белый текст для Error 11 (XNEUFKKFR) */
+        .error11-white-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -300%);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            z-index: 25;
+            pointer-events: auto;
+            user-select: text;
+            padding: 15px 0;
+            cursor: text;
+            background-color: transparent;
+        }
+
+        /* Белый текст для Error 10 - теперь пустой */
+        .error10-white-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -300%);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            z-index: 25;
+            pointer-events: auto;
+            user-select: text;
+            padding: 15px 0;
+            cursor: text;
+            background-color: transparent;
+        }
+
+        /* Белый текст для Error 20 */
+        .error20-white-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -80%);
+            color: #000000;
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            z-index: 25;
+            pointer-events: auto;
+            user-select: text;
+            padding: 15px 0;
+            cursor: text;
+            background-color: transparent;
+            white-space: pre-line;
+            line-height: 1.5;
+        }
+
+        /* Изображение капчи (Error 7) - по середине, без рамки */
+        .captcha-image {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: auto;
+            max-width: 90vw;
+            z-index: 30;
+            user-select: none;
+            pointer-events: none;
+            display: block;
+        }
+
+        /* Контейнер для QR-кодов на Error 16 - строго по центру */
+        .qr-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            z-index: 35;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .qr-container.visible {
+            display: flex;
+        }
+        
+        .qr-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 0.1s ease;
+            pointer-events: none;
+        }
+        
+        .qr-image.active {
+            opacity: 1;
+        }
+
+        /* Контейнер для кнопки поддержки (чтобы можно было наложить куб) */
+        .support-button-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            width: 48px;
+            height: 48px;
+            z-index: 40;
+        }
+
+        /* Кнопка-иконка в правом верхнем углу (обычное состояние) */
+        .support-button {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #aaaaaa;
+            border-radius: 50%;
+            background-color: #f2f2f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .support-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .support-button:active {
+            background-color: #c0c0c0;
+        }
+
+        .support-button img {
+            width: 30px;
+            height: 30px;
+            display: block;
+            filter: brightness(0.2);
+        }
+
+        /* Куб для Error 13 (накладывается поверх кнопки) */
+        .error13-cube {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(74, 163, 255, 0.5);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(74, 163, 255, 0.8);
+            z-index: 45;
+            pointer-events: auto;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .error13-cube::before,
+        .error13-cube::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border-radius: 8px;
+        }
+        
+        .error13-cube::before {
+            background: linear-gradient(135deg, 
+                transparent 25%, 
+                rgba(255, 255, 255, 0.8) 40%, 
+                rgba(255, 255, 255, 1) 45%, 
+                rgba(255, 255, 255, 0.8) 50%, 
+                transparent 65%);
+        }
+
+        .error13-cube::after {
+            background: linear-gradient(135deg, 
+                transparent 45%, 
+                rgba(255, 255, 255, 0.8) 60%, 
+                rgba(255, 255, 255, 1) 65%, 
+                rgba(255, 255, 255, 0.8) 70%, 
+                transparent 85%);
+        }
+        
+        .error13-cube.visible {
+            display: block;
+        }
+        
+        .error13-cube.hidden-cube {
+            display: none;
+        }
+
+        /* Контейнер для цветков внизу - по умолчанию скрыт */
+        .flowers-container {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            z-index: 15;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .flowers-container.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .flower-symbol {
+            font-size: 48px;
+            cursor: pointer;
+            user-select: none;
+            color: #000000;
+            transition: opacity 0.1s, transform 0.2s;
+        }
+        
+        .flower-symbol:hover {
+            transform: scale(1.1);
+        }
+
+        .flower-symbol:active {
+            opacity: 0.7;
+        }
+
+        /* Контейнер для чекбоксов Error 10 (99 штук, без текста) */
+        .checkbox-container {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px;
+            z-index: 50;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .checkbox-container.hidden {
+            display: none;
+        }
+        
+        /* Пустой чекбокс без текста */
+        .checkbox-item {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        /* Серая кнопка I agree */
+        .agree-button {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 40px;
+            background-color: #cccccc;
+            border: 1px solid #999999;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #666666;
+            cursor: not-allowed;
+            pointer-events: none;
+            z-index: 55;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        
+        .agree-button.active {
+            background-color: #4CAF50;
+            border-color: #45a049;
+            color: white;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        
+        .agree-button.active:hover {
+            background-color: #45a049;
+        }
+        
+        .agree-button.hidden {
+            display: none;
+        }
+
+        /* Модальное окно ввода */
+        .custom-prompt {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+            font-family: 'Segoe UI', 'Tahoma', sans-serif;
+            z-index: 100;
+        }
+
+        .custom-prompt.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .prompt-box {
+            background: #ffffff;
+            border: 2px solid #1e3a5f;
+            outline: 1px solid #c0c0c0;
+            padding: 24px 28px 28px 28px;
+            max-width: 380px;
+            width: 90%;
+            text-align: left;
+            background-color: #fefefe;
+        }
+
+        .prompt-box p {
+            font-size: 18px;
+            margin-bottom: 18px;
+            color: #000;
+        }
+
+        .prompt-box input {
+            width: 100%;
+            padding: 10px 8px;
+            font-size: 16px;
+            border: 1px solid #7f9db9;
+            background: #fff;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .prompt-box button {
+            background-color: #dbeaf5;
+            border: 1px solid #1e3a5f;
+            padding: 10px 34px;
+            font-size: 17px;
+            font-weight: 500;
+            color: #000;
+            cursor: pointer;
+            float: right;
+        }
+
+        .prompt-box button:hover {
+            background-color: #b9d5f0;
+        }
+
+        /* Второе окно — кастомный alert */
+        .custom-alert {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+            z-index: 110;
+        }
+
+        .custom-alert.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .alert-box {
+            background: #fff6f6;
+            border: 2px solid #9e2b2b;
+            outline: 1px solid #d4b5b5;
+            padding: 28px 32px 32px 32px;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+
+        .alert-box h2 {
+            font-size: 42px;
+            font-weight: 600;
+            color: #7a1f1f;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .alert-box p {
+            font-size: 18px;
+            color: #1e1e1e;
+            margin-bottom: 28px;
+            border-top: 1px solid #c0a0a0;
+            padding-top: 16px;
+        }
+
+        .alert-box button {
+            background-color: #e1e1e1;
+            border: 1px solid #5f3e3e;
+            padding: 8px 34px;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .alert-box button:hover {
+            background-color: #d0d0d0;
+        }
+
+        /* Галочка в правом нижнем углу алерта (только для Error 10) */
+        .alert-checkbox {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+        .alert-checkbox.hidden {
+            display: none;
+        }
+        
+        .alert-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .alert-checkbox label {
+            font-size: 12px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        /* Пасхалка VIDOKL */
+        .easter-egg-image {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            max-width: 80vw;
+            max-height: 80vh;
+            z-index: 200;
+            display: none;
+            pointer-events: none;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        
+        .easter-egg-image.visible {
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Текст по центру, но выше -->
+    <div class="centered-higher">
+        <div class="error-code" id="errorCode">
+            Error <span class="error-number" id="errorNumber">4</span>
+        </div>
+        <div class="support-line" id="supportMessage">Please write to support</div>
+    </div>
+
+    <!-- Белый текст GMPXFS (Error 4) -->
+    <div class="white-text" id="whiteText">GMPXFS</div>
+    
+    <!-- Белый текст MORSE (Error 5) -->
+    <div class="morse-white-text" id="morseWhiteText"></div>
+    
+    <!-- Белый текст XZKGXSZ (Error 1) -->
+    <div class="error1-white-text" id="error1WhiteText"></div>
+
+    <!-- Белый текст XNEUFKKFR (Error 11) -->
+    <div class="error11-white-text" id="error11WhiteText"></div>
+
+    <!-- Белый текст для Error 10 (пустой) -->
+    <div class="error10-white-text" id="error10WhiteText"></div>
+
+    <!-- Белый текст для Error 20 -->
+    <div class="error20-white-text hidden" id="error20WhiteText">I'm sorry for making you replay the game.
+But now you know that the word SET makes reSET
+This is the end for now, maybe the game will continue in the future
+Good luck!
+Comming soon...</div>
+
+    <!-- Изображение капчи (Error 7) -->
+    <img src="captcha.png" alt="CAPTCHA" class="captcha-image hidden" id="captchaImage">
+
+    <!-- Контейнер для QR-кодов Error 16 -->
+<div class="qr-container" id="qrContainer">
+    <img src="qr1.png" alt="QR Code 1" class="qr-image" id="qr1">
+    <img src="qr2.png" alt="QR Code 2" class="qr-image" id="qr2">
+    <img src="qr3.png" alt="QR Code 3" class="qr-image" id="qr3">
+    <img src="qr4.png" alt="QR Code 4" class="qr-image" id="qr4">
+    <img src="qr5.png" alt="QR Code 5" class="qr-image" id="qr5">
+    <img src="qr6.png" alt="QR Code 6" class="qr-image" id="qr6">
+    <img src="qr7.png" alt="QR Code 7" class="qr-image" id="qr7">
+</div>
+
+    <!-- Контейнер для кнопки поддержки и куба -->
+    <div class="support-button-wrapper" id="supportWrapper">
+        <div class="support-button" id="supportIcon">
+            <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/icons/headset.svg" alt="support">
+        </div>
+        <div class="error13-cube" id="error13Cube"></div>
+    </div>
+
+    <!-- Контейнер с цветками внизу -->
+    <div class="flowers-container" id="flowersContainer">
+        <div class="flower-symbol" id="resetAllFlower">✿</div>
+        <div class="flower-symbol" id="flowerSymbol">✿</div>
+        <div class="flower-symbol" id="undoFlower">✿</div>
+    </div>
+
+    <!-- Контейнер для чекбоксов Error 10 (49 штук, без текста) -->
+    <div class="checkbox-container hidden" id="checkboxContainer"></div>
+    
+    <!-- Серая кнопка I agree для Error 10 -->
+    <button class="agree-button hidden" id="agreeButton">I agree</button>
+
+    <!-- Модалка 1: поле ввода -->
+    <div class="custom-prompt" id="promptModal">
+        <div class="prompt-box">
+            <p id="promptTitle">Write your question to support:</p>
+            <input type="text" id="supportInput" placeholder="type here..." autocomplete="off">
+            <div>
+                <button id="submitQuestion">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка 2: кастомный Error 1 alert -->
+    <div class="custom-alert" id="errorAlertModal">
+        <div class="alert-box">
+            <h2 id="alertTitle">Error 1</h2>
+            <p id="alertMessage">Support did not understand you! But maybe you need some tips? Then go to telegram: @HintsVirror</p>
+            <button id="closeErrorAlert">OK</button>
+            <!-- Галочка в правом нижнем углу алерта (только для Error 10) -->
+            <div class="alert-checkbox hidden" id="alertCheckboxContainer">
+                <input type="checkbox" id="alertCheckbox">
+                <!-- <label for="alertCheckbox">Confirm</label> -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Пасхалка VIDOKL -->
+    <img src="vidokl.png" alt="VIDOKL" class="easter-egg-image" id="vidoklImage">
+
+    <script>
+        (function() {
+            const supportWrapper = document.getElementById('supportWrapper');
+            const supportBtn = document.getElementById('supportIcon');
+            const error13Cube = document.getElementById('error13Cube');
+            const promptModal = document.getElementById('promptModal');
+            const errorModal = document.getElementById('errorAlertModal');
+            const submitBtn = document.getElementById('submitQuestion');
+            const inputField = document.getElementById('supportInput');
+            const promptTitle = document.getElementById('promptTitle');
+            const closeErrorBtn = document.getElementById('closeErrorAlert');
+            const flowerSymbol = document.getElementById('flowerSymbol');
+            const resetAllFlower = document.getElementById('resetAllFlower');
+            const undoFlower = document.getElementById('undoFlower');
+            const flowersContainer = document.getElementById('flowersContainer');
+            const morseWhiteText = document.getElementById('morseWhiteText');
+            const error1WhiteText = document.getElementById('error1WhiteText');
+            const error11WhiteText = document.getElementById('error11WhiteText');
+            const error10WhiteText = document.getElementById('error10WhiteText');
+            const error20WhiteText = document.getElementById('error20WhiteText');
+            const captchaImage = document.getElementById('captchaImage');
+            const vidoklImage = document.getElementById('vidoklImage');
+            const checkboxContainer = document.getElementById('checkboxContainer');
+            const agreeButton = document.getElementById('agreeButton');
+            const alertCheckboxContainer = document.getElementById('alertCheckboxContainer');
+            const alertCheckbox = document.getElementById('alertCheckbox');
+            const qrContainer = document.getElementById('qrContainer');
+            const qrImages = [
+    document.getElementById('qr1'),
+    document.getElementById('qr2'),
+    document.getElementById('qr3'),
+    document.getElementById('qr4'),
+    document.getElementById('qr5'),
+    document.getElementById('qr6'),
+    document.getElementById('qr7')
+];
+            
+            const errorNumberEl = document.getElementById('errorNumber');
+            const supportMessageEl = document.getElementById('supportMessage');
+            const whiteTextEl = document.getElementById('whiteText');
+            const alertTitleEl = document.getElementById('alertTitle');
+            const alertMessageEl = document.getElementById('alertMessage');
+
+            // Состояние
+            let flowerCount = 0;
+            let needRestReached = false;
+            let restedReached = false;
+            let morseCodeCompleted = false;
+            let error9ClickCount = 0;
+            let error6Reached = false;
+            let error1Reached = false;
+            let error7Reached = false;
+            let error11Reached = false;
+            let error8Reached = false;
+            let error13Reached = false;
+            let error10Reached = false;
+            let error15Reached = false;
+            let error18Reached = false; // вопрос про хлоропласты
+            let error19Reached = false; // "And now without Google!"
+            let error12Reached = false; // Error 12 (Avatar)
+            let error14Reached = false; // Error 14 (/)
+            let error16Reached = false; // Error 16 (Try to catch! с QR-кодами)
+            let error17Reached = false; // Error 17 (Try to write the word — SET)
+            let error20Reached = false; // Error 20 (финальный текст с извинениями)
+            
+            // Флаг, который определяет, куда ведет superqr67: false -> Error 17, true -> Error 20
+            let superResetMode = false;
+            
+            // Флаг доступности команды SET (разблокируется на Error 17 и остается навсегда)
+            let setCommandUnlocked = false;
+            
+            let vidoklUnlocked = false;
+            let savedUserText = '';
+            let supportUnlockedOnError13 = false;      // Куб исчез, поддержка доступна
+            let interestingModeOnError13 = false;      // Режим "Interesting..." после вторых 10 секунд
+            
+            let error13LongPressTimer = null;
+            let error13SecondPhaseTimer = null;        // Таймер для второго этапа
+            
+            let qrAnimationInterval = null;             // Интервал для анимации QR-кодов
+            let currentQrIndex = 0;                      // Текущий индекс QR-кода
+            
+            const CLICKS_TO_TURN = 50;
+            
+            // Состояние чекбоксов для Error 10 - 49 штук
+            let checkboxesState = [];
+            const CHECKBOX_COUNT = 99;
+            let allCheckboxesChecked = false;
+            let alertCheckboxChecked = false;
+            
+            let audioContext = null;
+            
+            let pressTimer = null;
+            let isPressing = false;
+            let longPressTriggered = false;
+            const LONG_PRESS_DURATION = 500;
+
+            let morseSequence = [];
+            
+            const targetSequence = ['-', '-', '-', '-', '-', '.', '-', '.', '.', '.', '.', '.'];
+            
+            const easterEggSequence = [
+                '.', '.', '.', '-',
+                '.', '.',
+                '-', '.', '.',
+                '-', '-', '-',
+                '-', '.', '-',
+                '.', '-', '.', '.'
+            ];
+
+            // Функция для запуска анимации QR-кодов (рандомно без повторений)
+function startQrAnimation() {
+    if (qrAnimationInterval) {
+        clearInterval(qrAnimationInterval);
+    }
+    
+    // Скрываем все QR-коды
+    qrImages.forEach(img => {
+        img.classList.remove('active');
+    });
+    
+    // Создаем массив индексов для перемешивания
+    let indices = [];
+    for (let i = 0; i < qrImages.length; i++) {
+        indices.push(i);
+    }
+    
+    // Перемешиваем массив индексов (алгоритм Фишера-Йетса)
+    for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    
+    let currentIndexInShuffled = 0;
+    
+    // Показываем первый случайный QR-код
+    const firstIndex = indices[0];
+    qrImages[firstIndex].classList.add('active');
+    
+    // Запускаем интервал
+    qrAnimationInterval = setInterval(() => {
+        // Скрываем текущий
+        const currentIndex = indices[currentIndexInShuffled];
+        qrImages[currentIndex].classList.remove('active');
+        
+        // Переходим к следующему индексу в перемешанном массиве
+        currentIndexInShuffled = (currentIndexInShuffled + 1) % indices.length;
+        
+        // Если закончили цикл, перемешиваем массив заново
+        if (currentIndexInShuffled === 0) {
+            // Перемешиваем индексы заново
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+        }
+        
+        // Показываем следующий
+        const nextIndex = indices[currentIndexInShuffled];
+        qrImages[nextIndex].classList.add('active');
+    }, 100); // 100 мс для быстрого перелистывания
+}
+            
+            // Функция для остановки анимации QR-кодов
+            function stopQrAnimation() {
+                if (qrAnimationInterval) {
+                    clearInterval(qrAnimationInterval);
+                    qrAnimationInterval = null;
+                }
+                
+                // Скрываем все QR-коды
+                qrImages.forEach(img => {
+                    img.classList.remove('active');
+                });
+            }
+
+            // Инициализация 49 чекбоксов (без текста)
+            function initCheckboxes() {
+                checkboxContainer.innerHTML = '';
+                checkboxesState = [];
+                
+                // Создаем 49 чекбоксов, каждый в своем контейнере, но без текста
+                for (let i = 0; i < CHECKBOX_COUNT; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-item';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `checkbox-${i}`;
+                    checkbox.title = `Checkbox ${i + 1}`; // Только тултип при наведении
+                    
+                    div.appendChild(checkbox);
+                    checkboxContainer.appendChild(div);
+                    
+                    checkboxesState.push({
+                        element: checkbox,
+                        checked: false
+                    });
+                    
+                    checkbox.addEventListener('change', function(e) {
+                        const index = parseInt(this.id.split('-')[1]);
+                        checkboxesState[index].checked = this.checked;
+                        updateAgreeButtonState();
+                    });
+                }
+            }
+            
+            // Обновление состояния кнопки I agree
+            function updateAgreeButtonState() {
+                if (!error10Reached) return;
+                
+                const allChecked = checkboxesState.every(item => item.checked === true);
+                allCheckboxesChecked = allChecked;
+                
+                if (allChecked && alertCheckboxChecked) {
+                    agreeButton.classList.add('active');
+                } else {
+                    agreeButton.classList.remove('active');
+                }
+            }
+            
+            // Сброс чекбоксов
+            function resetCheckboxes() {
+                checkboxesState.forEach((item, index) => {
+                    if (item.element) {
+                        item.element.checked = false;
+                        item.checked = false;
+                    }
+                });
+                allCheckboxesChecked = false;
+                alertCheckboxChecked = false;
+                if (alertCheckbox) alertCheckbox.checked = false;
+                agreeButton.classList.remove('active');
+            }
+
+            function initAudio() {
+                if (audioContext) return;
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Web Audio API не поддерживается');
+                }
+            }
+
+            function playSound(duration, type = 'normal') {
+                if (!audioContext) {
+                    initAudio();
+                }
+                
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume().then(() => {
+                        playTone(duration, type);
+                    });
+                } else if (audioContext) {
+                    playTone(duration, type);
+                }
+            }
+
+            function playTone(duration, type = 'normal') {
+                if (!audioContext) return;
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                switch(type) {
+                    case 'reset':
+                        oscillator.type = 'sawtooth';
+                        oscillator.frequency.value = 98.00;
+                        gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+                        break;
+                        
+                    case 'undo':
+                        oscillator.type = 'square';
+                        oscillator.frequency.value = 130.81;
+                        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+                        break;
+
+                    case 'click':
+                        oscillator.type = 'sine';
+                        oscillator.frequency.value = 2000;
+                        gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+                        break;
+                        
+                    default:
+                        oscillator.type = 'sine';
+                        oscillator.frequency.value = 783.99;
+                        gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+                        gainNode.gain.setValueAtTime(0.08, audioContext.currentTime + duration - 0.01);
+                        gainNode.gain.setValueAtTime(0, audioContext.currentTime + duration);
+                        break;
+                }
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + duration);
+            }
+
+            function checkMorseSequence() {
+                if (morseSequence.length === targetSequence.length) {
+                    let isMatch = true;
+                    for (let i = 0; i < targetSequence.length; i++) {
+                        if (morseSequence[i] !== targetSequence[i]) {
+                            isMatch = false;
+                            break;
+                        }
+                    }
+                    
+                    if (isMatch) {
+                        console.log('Правильная последовательность MORSE! Error 9!');
+                        morseCodeCompleted = true;
+                        error9ClickCount = 0;
+                        errorNumberEl.style.transform = 'rotate(0deg)';
+                        errorNumberEl.classList.remove('finished');
+                        updateDisplay();
+                        return;
+                    }
+                }
+                
+                if (!vidoklUnlocked && restedReached && !morseCodeCompleted) {
+                    if (morseSequence.length >= easterEggSequence.length) {
+                        let isMatch = true;
+                        for (let i = 0; i < easterEggSequence.length; i++) {
+                            if (morseSequence[i] !== easterEggSequence[i]) {
+                                isMatch = false;
+                                break;
+                            }
+                        }
+                        
+                        if (isMatch) {
+                            console.log('Пасхалка VIDOKL активирована!');
+                            vidoklUnlocked = true;
+                            updateEasterEggDisplay();
+                        }
+                    }
+                }
+            }
+            
+            function updateEasterEggDisplay() {
+                if (restedReached && vidoklUnlocked) {
+                    vidoklImage.classList.add('visible');
+                } else {
+                    vidoklImage.classList.remove('visible');
+                }
+            }
+
+            function handleNumberClick(e) {
+                if (!morseCodeCompleted || error6Reached || error1Reached || error7Reached || error11Reached || error8Reached || error13Reached || error10Reached || error15Reached || error18Reached || error19Reached || error12Reached || error14Reached || error16Reached || error17Reached || error20Reached) return;
+                
+                error9ClickCount++;
+                
+                const rotation = error9ClickCount * 3.6;
+                errorNumberEl.style.transform = `rotate(${rotation}deg)`;
+                
+                playSound(0.02, 'click');
+                
+                console.log(`Нажатие ${error9ClickCount}/${CLICKS_TO_TURN}, поворот: ${rotation}°`);
+                
+                if (error9ClickCount >= CLICKS_TO_TURN) {
+                    console.log('Error 6 достигнут!');
+                    error6Reached = true;
+                    morseCodeCompleted = false;
+                    updateDisplay();
+                }
+                
+                saveState();
+            }
+
+            function startPress(e) {
+                e.preventDefault();
+                
+                if (isPressing) return;
+                
+                isPressing = true;
+                longPressTriggered = false;
+                
+                pressTimer = setTimeout(() => {
+                    if (isPressing) {
+                        longPressTriggered = true;
+                        playSound(0.4, 'normal');
+                        
+                        morseSequence.push('-');
+                        console.log('Добавлено тире, последовательность:', morseSequence.join(''));
+                        
+                        checkMorseSequence();
+                    }
+                }, LONG_PRESS_DURATION);
+            }
+
+            function endPress(e) {
+                e.preventDefault();
+                
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+                
+                if (isPressing && !longPressTriggered) {
+                    playSound(0.1, 'normal');
+                    
+                    morseSequence.push('.');
+                    console.log('Добавлена точка, последовательность:', morseSequence.join(''));
+                    
+                    checkMorseSequence();
+                }
+                
+                isPressing = false;
+                longPressTriggered = false;
+            }
+
+            function resetAllSequence(e) {
+                e.preventDefault();
+                
+                resetAllFlower.style.opacity = '0.5';
+                setTimeout(() => {
+                    resetAllFlower.style.opacity = '1';
+                }, 100);
+                
+                morseSequence = [];
+                playSound(0.5, 'reset');
+                
+                console.log('Морзянка полностью сброшена');
+            }
+
+            function undoLastSound(e) {
+                e.preventDefault();
+                
+                undoFlower.style.opacity = '0.5';
+                setTimeout(() => {
+                    undoFlower.style.opacity = '1';
+                }, 100);
+                
+                if (morseSequence.length > 0) {
+                    const removed = morseSequence.pop();
+                    console.log('Удален последний звук:', removed, 'новая последовательность:', morseSequence.join(''));
+                    playSound(0.4, 'undo');
+                } else {
+                    console.log('Нечего удалять');
+                    playSound(0.2, 'reset');
+                }
+            }
+
+            function startError13LongPress(e) {
+                e.preventDefault();
+                
+                if (!error13Reached) return;
+                
+                console.log('Начало долгого нажатия на Error 13');
+                
+                // Если уже в режиме Interesting, второй таймер не запускаем
+                if (interestingModeOnError13) return;
+                
+                // Первый этап (10 секунд) - разблокировка поддержки и исчезновение куба
+                if (!supportUnlockedOnError13) {
+                    error13LongPressTimer = setTimeout(() => {
+                        if (error13Reached) {
+                            console.log('10 секунд: куб исчез, поддержка разблокирована');
+                            supportUnlockedOnError13 = true;
+                            
+                            error13Cube.classList.remove('visible');
+                            error13Cube.classList.add('hidden-cube');
+                            
+                            // После разблокировки поддержки запускаем второй этап
+                            startSecondPhase();
+                        }
+                    }, 10000);
+                }
+            }
+            
+            function startSecondPhase() {
+                if (!error13Reached || interestingModeOnError13) return;
+                
+                console.log('Запуск второго этапа (ещё 10 секунд до Interesting...)');
+                
+                error13SecondPhaseTimer = setTimeout(() => {
+                    if (error13Reached && supportUnlockedOnError13) {
+                        console.log('20 секунд: включаем режим Interesting...');
+                        interestingModeOnError13 = true;
+                        supportMessageEl.textContent = 'Interesting...';
+                        updateDisplay(); // Обновим отображение
+                    }
+                }, 10000);
+            }
+            
+            function endError13LongPress(e) {
+                e.preventDefault();
+                
+                if (error13LongPressTimer) {
+                    clearTimeout(error13LongPressTimer);
+                    error13LongPressTimer = null;
+                }
+                
+                if (error13SecondPhaseTimer) {
+                    clearTimeout(error13SecondPhaseTimer);
+                    error13SecondPhaseTimer = null;
+                }
+                
+                if (!error13Reached) return;
+                
+                console.log('Долгое нажатие прервано');
+            }
+
+            function loadState() {
+                const savedState = localStorage.getItem('flowerGameState');
+                if (savedState) {
+                    try {
+                        const state = JSON.parse(savedState);
+                        
+                        flowerCount = state.flowerCount || 0;
+                        needRestReached = state.needRestReached || false;
+                        restedReached = state.restedReached || false;
+                        morseCodeCompleted = state.morseCodeCompleted || false;
+                        error9ClickCount = state.error9ClickCount || 0;
+                        error6Reached = state.error6Reached || false;
+                        error1Reached = state.error1Reached || false;
+                        error7Reached = state.error7Reached || false;
+                        error11Reached = state.error11Reached || false;
+                        error8Reached = state.error8Reached || false;
+                        error13Reached = state.error13Reached || false;
+                        error10Reached = state.error10Reached || false;
+                        error15Reached = state.error15Reached || false;
+                        error18Reached = state.error18Reached || false;
+                        error19Reached = state.error19Reached || false;
+                        error12Reached = state.error12Reached || false;
+                        error14Reached = state.error14Reached || false;
+                        error16Reached = state.error16Reached || false;
+                        error17Reached = state.error17Reached || false;
+                        error20Reached = state.error20Reached || false;
+                        superResetMode = state.superResetMode || false;
+                        setCommandUnlocked = state.setCommandUnlocked || false;
+                        savedUserText = state.savedUserText || '';
+                        vidoklUnlocked = state.vidoklUnlocked || false;
+                        supportUnlockedOnError13 = state.supportUnlockedOnError13 || false;
+                        interestingModeOnError13 = state.interestingModeOnError13 || false;
+                        
+                        updateDisplay();
+                    } catch (e) {
+                        console.error('Ошибка загрузки состояния', e);
+                    }
+                }
+            }
+
+            function saveState() {
+                const state = {
+                    flowerCount: flowerCount,
+                    needRestReached: needRestReached,
+                    restedReached: restedReached,
+                    morseCodeCompleted: morseCodeCompleted,
+                    error9ClickCount: error9ClickCount,
+                    error6Reached: error6Reached,
+                    error1Reached: error1Reached,
+                    error7Reached: error7Reached,
+                    error11Reached: error11Reached,
+                    error8Reached: error8Reached,
+                    error13Reached: error13Reached,
+                    error10Reached: error10Reached,
+                    error15Reached: error15Reached,
+                    error18Reached: error18Reached,
+                    error19Reached: error19Reached,
+                    error12Reached: error12Reached,
+                    error14Reached: error14Reached,
+                    error16Reached: error16Reached,
+                    error17Reached: error17Reached,
+                    error20Reached: error20Reached,
+                    superResetMode: superResetMode,
+                    setCommandUnlocked: setCommandUnlocked,
+                    savedUserText: savedUserText,
+                    vidoklUnlocked: vidoklUnlocked,
+                    supportUnlockedOnError13: supportUnlockedOnError13,
+                    interestingModeOnError13: interestingModeOnError13
+                };
+                localStorage.setItem('flowerGameState', JSON.stringify(state));
+            }
+
+            function updateDisplay() {
+                morseWhiteText.textContent = '';
+                error1WhiteText.textContent = '';
+                error11WhiteText.textContent = '';
+                error10WhiteText.textContent = '';
+                error20WhiteText.classList.add('hidden');
+                captchaImage.classList.add('hidden');
+                
+                checkboxContainer.classList.add('hidden');
+                agreeButton.classList.add('hidden');
+                
+                // Скрываем контейнер с QR-кодами и останавливаем анимацию
+                qrContainer.classList.remove('visible');
+                stopQrAnimation();
+                
+                // Явно скрываем куб по умолчанию и сбрасываем все классы
+                error13Cube.classList.remove('visible');
+                error13Cube.classList.remove('hidden-cube');
+                
+                // Управление видимостью галочки в алерте (только для Error 10)
+                if (error10Reached) {
+                    alertCheckboxContainer.classList.remove('hidden');
+                } else {
+                    alertCheckboxContainer.classList.add('hidden');
+                }
+                
+                // Error 20 (финальный экран)
+                if (error20Reached) {
+                    errorNumberEl.textContent = '20';
+                    supportMessageEl.textContent = '';
+                    whiteTextEl.textContent = '';
+                    error20WhiteText.classList.remove('hidden');
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    saveState();
+                    return;
+                }
+                
+                // Error 17
+                if (error17Reached) {
+                    errorNumberEl.textContent = '17';
+                    supportMessageEl.textContent = 'Try to write the word — SET';
+                    whiteTextEl.textContent = '';
+                    error10WhiteText.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    saveState();
+                    return;
+                }
+                
+                // Error 16 (Try to catch! с QR-кодами)
+                if (error16Reached) {
+                    errorNumberEl.textContent = '16';
+                    supportMessageEl.textContent = 'Try to catch!';
+                    whiteTextEl.textContent = '';
+                    error10WhiteText.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    // Показываем контейнер с QR-кодами
+                    qrContainer.classList.add('visible');
+                    
+                    // Запускаем анимацию QR-кодов
+                    startQrAnimation();
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    saveState();
+                    return;
+                }
+                
+                // Error 14 (просто слэш)
+                if (error14Reached) {
+                    errorNumberEl.textContent = '14';
+                    supportMessageEl.textContent = '/';
+                    whiteTextEl.textContent = '';
+                    error10WhiteText.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    saveState();
+                    return;
+                }
+                
+                // Error 12 (Avatar)
+                if (error12Reached) {
+                    errorNumberEl.textContent = '12';
+                    supportMessageEl.textContent = 'Avatar';
+                    whiteTextEl.textContent = '';
+                    error10WhiteText.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    saveState();
+                    return;
+                }
+                
+                // Error 19 (без гугла)
+                if (error19Reached) {
+                    errorNumberEl.textContent = '19';
+                    supportMessageEl.textContent = 'And now without Google!';
+                    whiteTextEl.textContent = '';
+                    error10WhiteText.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    saveState();
+                    return;
+                }
+                
+                // Error 18 (новый уровень)
+                if (error18Reached) {
+                    errorNumberEl.textContent = '18';
+                    supportMessageEl.textContent = 'Green organelles that turn sunlight into food for a plant. What are they called?';
+                    whiteTextEl.textContent = '';
+                    error10WhiteText.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    saveState();
+                    return;
+                }
+                
+                // Error 15
+                if (error15Reached) {
+                    errorNumberEl.textContent = '15';
+                    // Заменяем текст и создаем кликабельное слово "here"
+                    supportMessageEl.innerHTML = 'Support is somewhere <span class="clickable-word" id="supportHereClick">here</span>';
+                    whiteTextEl.textContent = '';
+                    error10WhiteText.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Скрываем кнопку поддержки
+                    supportWrapper.style.display = 'none';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    // Добавляем обработчик на слово "here" в Error 15
+                    setTimeout(() => {
+                        const hereSpan = document.getElementById('supportHereClick');
+                        if (hereSpan) {
+                            // Убираем все предыдущие обработчики, чтобы не было дублей
+                            hereSpan.replaceWith(hereSpan.cloneNode(true));
+                            const newHereSpan = document.getElementById('supportHereClick');
+                            if (newHereSpan) {
+                                newHereSpan.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('Клик по here в Error 15');
+                                    // Открываем модальное окно с измененным заголовком
+                                    openError15Prompt();
+                                });
+                            }
+                        }
+                    }, 0);
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 13
+                if (error13Reached) {
+                    errorNumberEl.textContent = '13';
+                    
+                    // Показываем соответствующий текст
+                    if (interestingModeOnError13) {
+                        supportMessageEl.textContent = 'Interesting...';
+                    } else {
+                        supportMessageEl.textContent = 'ICE';
+                    }
+                    
+                    whiteTextEl.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    // Управление видимостью куба
+                    if (!supportUnlockedOnError13 && !interestingModeOnError13) {
+                        error13Cube.classList.add('visible');
+                        error13Cube.classList.remove('hidden-cube');
+                    } else {
+                        error13Cube.classList.remove('visible');
+                        error13Cube.classList.add('hidden-cube');
+                    }
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 8
+                if (error8Reached) {
+                    errorNumberEl.textContent = '8';
+                    supportMessageEl.textContent = 'Error 6';
+                    whiteTextEl.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 11
+                if (error11Reached) {
+                    errorNumberEl.textContent = '11';
+                    supportMessageEl.textContent = 'Ceabash';
+                    whiteTextEl.textContent = '';
+                    error11WhiteText.textContent = 'XNEUFKKFR';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 10
+                if (error10Reached) {
+                    errorNumberEl.textContent = '10';
+                    supportMessageEl.textContent = 'Do you agree with the site rules?';
+                    whiteTextEl.textContent = '';
+                    morseWhiteText.textContent = '';
+                    error1WhiteText.textContent = '';
+                    error11WhiteText.textContent = '';
+                    error10WhiteText.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Показываем кнопку поддержки
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    // Показываем чекбоксы и кнопку I agree
+                    checkboxContainer.classList.remove('hidden');
+                    agreeButton.classList.remove('hidden');
+                    agreeButton.classList.remove('active');
+                    
+                    // Инициализируем чекбоксы, если их еще нет
+                    if (checkboxContainer.children.length === 0) {
+                        initCheckboxes();
+                    }
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 7
+                if (error7Reached) {
+                    errorNumberEl.textContent = '7';
+                    supportMessageEl.textContent = 'Are you a robot?';
+                    whiteTextEl.textContent = '';
+                    captchaImage.classList.remove('hidden');
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 1
+                if (error1Reached) {
+                    errorNumberEl.textContent = '1';
+                    supportMessageEl.textContent = 'Vice versa again';
+                    whiteTextEl.textContent = '';
+                    error1WhiteText.textContent = 'XZKGXSZ';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    console.log('Сохраненный текст (тайна):', savedUserText);
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 6
+                if (error6Reached) {
+                    errorNumberEl.textContent = '6';
+                    supportMessageEl.textContent = 'Write something';
+                    whiteTextEl.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    promptTitle.textContent = 'Write something to support:';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.add('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 9
+                if (morseCodeCompleted) {
+                    errorNumberEl.textContent = '9';
+                    supportMessageEl.textContent = 'Vice versa';
+                    whiteTextEl.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'pointer';
+                    errorNumberEl.style.transition = 'transform 0.1s ease';
+                    errorNumberEl.classList.remove('finished');
+                    
+                    if (error9ClickCount > 0) {
+                        errorNumberEl.style.transform = `rotate(${error9ClickCount * 3.6}deg)`;
+                    } else {
+                        errorNumberEl.style.transform = 'none';
+                    }
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 5
+                if (restedReached) {
+                    errorNumberEl.textContent = '5';
+                    supportMessageEl.textContent = 'Beautiful flower!';
+                    whiteTextEl.textContent = '';
+                    morseWhiteText.textContent = 'MORSE';
+                    flowersContainer.classList.add('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.remove('finished');
+                    
+                    updateEasterEggDisplay();
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 3
+                if (needRestReached) {
+                    errorNumberEl.textContent = '3';
+                    
+                    const hasRefreshed = sessionStorage.getItem('pageRefreshed');
+                    
+                    if (hasRefreshed === 'true') {
+                        restedReached = true;
+                        needRestReached = false;
+                        sessionStorage.removeItem('pageRefreshed');
+                        updateDisplay();
+                        return;
+                    } else {
+                        supportMessageEl.textContent = 'Enough flowers, they need to rest';
+                    }
+                    
+                    whiteTextEl.textContent = '';
+                    flowersContainer.classList.remove('visible');
+                    
+                    // Кнопка поддержки видима
+                    supportWrapper.style.display = 'block';
+                    
+                    errorNumberEl.style.cursor = 'default';
+                    errorNumberEl.style.transform = 'none';
+                    errorNumberEl.style.transition = 'none';
+                    errorNumberEl.classList.remove('finished');
+                    
+                    if (vidoklUnlocked) vidoklUnlocked = false;
+                    updateEasterEggDisplay();
+                    
+                    saveState();
+                    return;
+                }
+                
+                // Error 4 / Error 2
+                switch(flowerCount) {
+                    case 0:
+                        errorNumberEl.textContent = '4';
+                        supportMessageEl.textContent = 'Please write to support';
+                        whiteTextEl.textContent = 'GMPXFS';
+                        break;
+                    case 1:
+                        errorNumberEl.textContent = '2';
+                        supportMessageEl.textContent = 'Not enough flowers';
+                        whiteTextEl.textContent = '';
+                        break;
+                    case 2:
+                        errorNumberEl.textContent = '2';
+                        supportMessageEl.textContent = 'Still lack of flowers';
+                        whiteTextEl.textContent = '';
+                        break;
+                    default:
+                        if (flowerCount >= 3) {
+                            needRestReached = true;
+                            updateDisplay();
+                            return;
+                        }
+                        break;
+                }
+                
+                // Кнопка поддержки видима для всех базовых состояний
+                supportWrapper.style.display = 'block';
+                
+                promptTitle.textContent = 'Write your question to support:';
+                
+                flowersContainer.classList.remove('visible');
+                errorNumberEl.style.cursor = 'default';
+                errorNumberEl.style.transform = 'none';
+                errorNumberEl.style.transition = 'none';
+                errorNumberEl.classList.remove('finished');
+                
+                if (vidoklUnlocked && !restedReached) {
+                    vidoklUnlocked = false;
+                }
+                updateEasterEggDisplay();
+                
+                saveState();
+            }
+
+            function openError15Prompt() {
+                // Специальное модальное окно для Error 15
+                promptTitle.innerHTML = 'New page is somewhere <span class="clickable-word" id="promptHereClick">here</span>';
+                promptModal.classList.add('active');
+                inputField.value = '';
+                inputField.focus();
+                
+                // Добавляем обработчик на слово "here" внутри модального окна
+                setTimeout(() => {
+                    const promptHereSpan = document.getElementById('promptHereClick');
+                    if (promptHereSpan) {
+                        // Убираем все предыдущие обработчики, чтобы не было дублей
+                        promptHereSpan.replaceWith(promptHereSpan.cloneNode(true));
+                        const newPromptHereSpan = document.getElementById('promptHereClick');
+                        if (newPromptHereSpan) {
+                            newPromptHereSpan.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('Клик по here в модальном окне');
+                                closePrompt();
+                                // Переходим на Error 18
+                                error15Reached = false;
+                                error18Reached = true;
+                                // Кнопка поддержки снова видима
+                                supportWrapper.style.display = 'block';
+                                updateDisplay();
+                            });
+                        }
+                    }
+                }, 0);
+            }
+
+            // Функция полного сброса (reset000)
+            function fullReset() {
+                flowerCount = 0;
+                needRestReached = false;
+                restedReached = false;
+                morseCodeCompleted = false;
+                error9ClickCount = 0;
+                error6Reached = false;
+                error1Reached = false;
+                error7Reached = false;
+                error11Reached = false;
+                error8Reached = false;
+                error13Reached = false;
+                error10Reached = false;
+                error15Reached = false;
+                error18Reached = false;
+                error19Reached = false;
+                error12Reached = false;
+                error14Reached = false;
+                error16Reached = false;
+                error17Reached = false;
+                error20Reached = false;
+                
+                // При fullReset режим супер-сброса сбрасывается в false
+                // (чтобы superqr67 снова вел на Error 17)
+                superResetMode = false;
+                
+                savedUserText = '';
+                vidoklUnlocked = false;
+                supportUnlockedOnError13 = false;
+                interestingModeOnError13 = false;
+                sessionStorage.removeItem('pageRefreshed');
+                
+                morseSequence = [];
+                errorNumberEl.style.transform = 'none';
+                errorNumberEl.style.transition = 'none';
+                errorNumberEl.classList.remove('finished');
+                
+                vidoklImage.classList.remove('visible');
+                
+                promptTitle.textContent = 'Write your question to support:';
+                
+                // Сброс состояния куба
+                error13Cube.classList.remove('visible');
+                error13Cube.classList.remove('hidden-cube');
+                
+                // Сброс таймеров
+                if (error13LongPressTimer) {
+                    clearTimeout(error13LongPressTimer);
+                    error13LongPressTimer = null;
+                }
+                if (error13SecondPhaseTimer) {
+                    clearTimeout(error13SecondPhaseTimer);
+                    error13SecondPhaseTimer = null;
+                }
+                
+                // Останавливаем анимацию QR-кодов
+                stopQrAnimation();
+                
+                // Кнопка поддержки видима по умолчанию
+                supportWrapper.style.display = 'block';
+                
+                resetCheckboxes();
+                
+                updateDisplay();
+                console.log('Полный сброс (reset000) выполнен');
+            }
+
+            // Функция супер-сброса (SET)
+            function superReset() {
+                flowerCount = 0;
+                needRestReached = false;
+                restedReached = false;
+                morseCodeCompleted = false;
+                error9ClickCount = 0;
+                error6Reached = false;
+                error1Reached = false;
+                error7Reached = false;
+                error11Reached = false;
+                error8Reached = false;
+                error13Reached = false;
+                error10Reached = false;
+                error15Reached = false;
+                error18Reached = false;
+                error19Reached = false;
+                error12Reached = false;
+                error14Reached = false;
+                error16Reached = false;
+                error17Reached = false;
+                error20Reached = false;
+                
+                // При superReset включаем режим супер-сброса
+                // (чтобы superqr67 вел на Error 20)
+                superResetMode = true;
+                
+                savedUserText = '';
+                vidoklUnlocked = false;
+                supportUnlockedOnError13 = false;
+                interestingModeOnError13 = false;
+                sessionStorage.removeItem('pageRefreshed');
+                
+                morseSequence = [];
+                errorNumberEl.style.transform = 'none';
+                errorNumberEl.style.transition = 'none';
+                errorNumberEl.classList.remove('finished');
+                
+                vidoklImage.classList.remove('visible');
+                
+                promptTitle.textContent = 'Write your question to support:';
+                
+                // Сброс состояния куба
+                error13Cube.classList.remove('visible');
+                error13Cube.classList.remove('hidden-cube');
+                
+                // Сброс таймеров
+                if (error13LongPressTimer) {
+                    clearTimeout(error13LongPressTimer);
+                    error13LongPressTimer = null;
+                }
+                if (error13SecondPhaseTimer) {
+                    clearTimeout(error13SecondPhaseTimer);
+                    error13SecondPhaseTimer = null;
+                }
+                
+                // Останавливаем анимацию QR-кодов
+                stopQrAnimation();
+                
+                // Кнопка поддержки видима по умолчанию
+                supportWrapper.style.display = 'block';
+                
+                resetCheckboxes();
+                
+                updateDisplay();
+                console.log('Супер-сброс (SET) выполнен');
+            }
+
+            // Новая функция для перехода на конкретную ошибку по команде #_#_X
+            function goToErrorByCommand(errorNumber) {
+                // Сброс всех состояний
+                flowerCount = 0;
+                needRestReached = false;
+                restedReached = false;
+                morseCodeCompleted = false;
+                error9ClickCount = 0;
+                error6Reached = false;
+                error1Reached = false;
+                error7Reached = false;
+                error11Reached = false;
+                error8Reached = false;
+                error13Reached = false;
+                error10Reached = false;
+                error15Reached = false;
+                error18Reached = false;
+                error19Reached = false;
+                error12Reached = false;
+                error14Reached = false;
+                error16Reached = false;
+                error17Reached = false;
+                error20Reached = false;
+                
+                // Сохраняем режим супер-сброса (он не сбрасывается при переходе по команде)
+                
+                morseSequence = [];
+                errorNumberEl.style.transform = 'none';
+                errorNumberEl.classList.remove('finished');
+                
+                // Сброс таймеров
+                if (error13LongPressTimer) {
+                    clearTimeout(error13LongPressTimer);
+                    error13LongPressTimer = null;
+                }
+                if (error13SecondPhaseTimer) {
+                    clearTimeout(error13SecondPhaseTimer);
+                    error13SecondPhaseTimer = null;
+                }
+                
+                // Останавливаем анимацию QR-кодов
+                stopQrAnimation();
+                
+                // Сброс состояния куба
+                error13Cube.classList.remove('visible');
+                error13Cube.classList.remove('hidden-cube');
+                
+                // Установка нужной ошибки
+                switch(errorNumber) {
+                    case 1:
+                        error1Reached = true;
+                        break;
+                    case 3:
+                        needRestReached = true;
+                        break;
+                    case 4:
+                        // По умолчанию Error 4
+                        break;
+                    case 5:
+                        restedReached = true;
+                        break;
+                    case 6:
+                        error6Reached = true;
+                        break;
+                    case 7:
+                        error7Reached = true;
+                        break;
+                    case 8:
+                        error8Reached = true;
+                        break;
+                    case 9:
+                        morseCodeCompleted = true;
+                        break;
+                    case 10:
+                        error10Reached = true;
+                        // Инициализируем чекбоксы для Error 10
+                        initCheckboxes();
+                        break;
+                    case 11:
+                        error11Reached = true;
+                        break;
+                    case 12:
+                        error12Reached = true;
+                        break;
+                    case 13:
+                        error13Reached = true;
+                        break;
+                    case 14:
+                        error14Reached = true;
+                        break;
+                    case 15:
+                        error15Reached = true;
+                        break;
+                    case 16:
+                        error16Reached = true;
+                        break;
+                    case 17:
+                        error17Reached = true;
+                        setCommandUnlocked = true; // Разблокируем SET команду
+                        break;
+                    case 18:
+                        error18Reached = true;
+                        break;
+                    case 19:
+                        error19Reached = true;
+                        break;
+                    case 20:
+                        error20Reached = true;
+                        break;
+                    default:
+                        // Если номер не распознан, остаемся на Error 4
+                        break;
+                }
+                
+                updateDisplay();
+                console.log(`Переход на Error ${errorNumber} по команде #_#_${errorNumber}`);
+            }
+
+            function openPrompt() {
+                promptModal.classList.add('active');
+                inputField.value = '';
+                inputField.focus();
+            }
+
+            function closePrompt() {
+                promptModal.classList.remove('active');
+                // Восстанавливаем заголовок, если он был изменен
+                if (!error15Reached) {
+                    promptTitle.textContent = 'Write your question to support:';
+                }
+            }
+
+            function showErrorAlert() {
+                errorModal.classList.add('active');
+            }
+
+            function closeErrorAlert() {
+                errorModal.classList.remove('active');
+            }
+
+            loadState();
+
+            if (needRestReached && !restedReached) {
+                sessionStorage.setItem('pageRefreshed', 'true');
+                updateDisplay();
+            }
+
+            supportBtn.addEventListener('click', function(e) {
+                if (error13Reached) {
+                    // В режиме Interesting поддержка тоже доступна
+                    if (supportUnlockedOnError13 || interestingModeOnError13) {
+                        openPrompt();
+                    }
+                } else {
+                    openPrompt();
+                }
+            });
+
+            error13Cube.addEventListener('mousedown', function(e) {
+                if (error13Reached && !supportUnlockedOnError13 && !interestingModeOnError13) {
+                    startError13LongPress(e);
+                }
+            });
+            
+            error13Cube.addEventListener('mouseup', function(e) {
+                if (error13Reached) {
+                    endError13LongPress(e);
+                }
+            });
+            
+            error13Cube.addEventListener('mouseleave', function(e) {
+                if (error13Reached) {
+                    endError13LongPress(e);
+                }
+            });
+            
+            error13Cube.addEventListener('touchstart', function(e) {
+                if (error13Reached && !supportUnlockedOnError13 && !interestingModeOnError13) {
+                    startError13LongPress(e);
+                }
+            }, { passive: false });
+            
+            error13Cube.addEventListener('touchend', function(e) {
+                if (error13Reached) {
+                    endError13LongPress(e);
+                }
+            });
+            
+            error13Cube.addEventListener('touchcancel', function(e) {
+                if (error13Reached) {
+                    endError13LongPress(e);
+                }
+            });
+
+            errorNumberEl.addEventListener('click', handleNumberClick);
+
+            submitBtn.addEventListener('click', function() {
+                const userInput = inputField.value.trim();
+                
+                if (userInput === '') {
+                    closePrompt();
+                    return;
+                }
+
+                // reset000 - полный сброс (возвращает к обычному прохождению)
+                if (userInput === 'reset000') {
+                    fullReset();
+                    closePrompt();
+                    return;
+                }
+
+                // Обработка команды SET (доступна только после разблокировки на Error 17)
+                if (userInput === 'SET' && setCommandUnlocked) {
+                    // SET работает везде, даже на Error 20
+                    superReset();
+                    closePrompt();
+                    return;
+                }
+
+                // Обработка команды разработчика #_#_X
+                const devCommandMatch = userInput.match(/^#_#_(\d+)$/);
+                if (devCommandMatch) {
+                    const errorNum = parseInt(devCommandMatch[1]);
+                    goToErrorByCommand(errorNum);
+                    closePrompt();
+                    return;
+                }
+
+                // Блокировка повторных нажатий
+                if (submitBtn.disabled) return;
+                
+                // Обработка для Error 16 (Try to catch!) - переход на Error 17 или 20 по коду superqr67
+                if (error16Reached && userInput === 'superqr67') {
+                    submitBtn.disabled = true;
+                    
+                    if (superResetMode) {
+                        console.log('superqr67 -> Error 20 (режим супер-сброса активен)');
+                        error16Reached = false;
+                        error20Reached = true;
+                    } else {
+                        console.log('superqr67 -> Error 17 (обычный режим)');
+                        error16Reached = false;
+                        error17Reached = true;
+                        setCommandUnlocked = true; // Разблокируем SET команду
+                    }
+                    
+                    promptModal.classList.remove('active');
+                    updateDisplay();
+                    
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                // Обработка для Error 14 (/) - переход на Error 16 по коду hce14
+                if (error14Reached && userInput === 'hce14') {
+                    submitBtn.disabled = true;
+                    
+                    console.log('hce14 -> Error 16 (Try to catch!)');
+                    
+                    promptModal.classList.remove('active');
+                    
+                    error14Reached = false;
+                    error16Reached = true;
+                    
+                    updateDisplay();
+                    
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                // Обработка для Error 12 (Avatar) - переход на Error 14 по коду 3555612
+                if (error12Reached && userInput === '3555612') {
+                    submitBtn.disabled = true;
+                    
+                    console.log('3555612 -> Error 14 (/)');
+                    
+                    promptModal.classList.remove('active');
+                    
+                    error12Reached = false;
+                    error14Reached = true;
+                    
+                    updateDisplay();
+                    
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                // ТЕХНИЧЕСКИ ПРАВИЛЬНЫЙ ПЕРЕХОД ICE -> Error 10
+                if (userInput === 'ICE' && error13Reached) {
+                    // Блокируем кнопку
+                    submitBtn.disabled = true;
+                    
+                    console.log('ICE -> Error 10 (технически правильный переход)');
+                    
+                    // Скрываем модалку
+                    promptModal.classList.remove('active');
+                    
+                    // Сбрасываем все таймеры Error 13
+                    if (error13LongPressTimer) {
+                        clearTimeout(error13LongPressTimer);
+                        error13LongPressTimer = null;
+                    }
+                    if (error13SecondPhaseTimer) {
+                        clearTimeout(error13SecondPhaseTimer);
+                        error13SecondPhaseTimer = null;
+                    }
+                    
+                    // Устанавливаем флаги через изменение состояния
+                    error13Reached = false;
+                    supportUnlockedOnError13 = false;
+                    interestingModeOnError13 = false;
+                    
+                    error10Reached = true;
+                    
+                    // Инициализируем чекбоксы
+                    initCheckboxes();
+                    
+                    // Вызываем updateDisplay для единообразного отображения
+                    updateDisplay();
+                    
+                    // Разблокируем кнопку
+                    submitBtn.disabled = false;
+                    
+                    return;
+                }
+
+                if (userInput === 'BLUETOOTH' && error11Reached && !error8Reached && !error13Reached) {
+                    error11Reached = false;
+                    error8Reached = true;
+                    updateDisplay();
+                    closePrompt();
+                    return;
+                }
+
+                if (error8Reached && !error13Reached && userInput === savedUserText) {
+                    error8Reached = false;
+                    error13Reached = true;
+                    updateDisplay();
+                    closePrompt();
+                    return;
+                }
+
+                if (userInput === 'wjeplm' && error7Reached && !error11Reached) {
+                    error7Reached = false;
+                    error11Reached = true;
+                    updateDisplay();
+                    closePrompt();
+                    return;
+                }
+
+                if (userInput === 'CAPTCHA' && error1Reached) {
+                    error1Reached = false;
+                    error7Reached = true;
+                    updateDisplay();
+                    closePrompt();
+                    return;
+                }
+
+                if (error6Reached && !error1Reached) {
+                    savedUserText = userInput;
+                    error6Reached = false;
+                    error1Reached = true;
+                    updateDisplay();
+                    closePrompt();
+                    return;
+                }
+                
+                if (error18Reached && userInput.toLowerCase() === 'chloroplasts') {
+                    error18Reached = false;
+                    error19Reached = true;
+                    updateDisplay();
+                    closePrompt();
+                    return;
+                }
+                
+                if (error19Reached) {
+                    const lowerInput = userInput.toLowerCase();
+                    const idkVariants = ['idk', 'i don\'t know', 'i dont know', 'i don’t know', 'i dont know'];
+                    if (idkVariants.includes(lowerInput)) {
+                        error19Reached = false;
+                        error12Reached = true;
+                        updateDisplay();
+                        closePrompt();
+                        return;
+                    }
+                }
+
+                if (userInput === 'FLOWER') {
+                    
+                    if (restedReached || morseCodeCompleted || error6Reached || error1Reached || error7Reached || error11Reached || error8Reached || error13Reached || error10Reached || error15Reached || error18Reached || error19Reached || error12Reached || error14Reached || error16Reached || error17Reached || error20Reached) {
+                        closePrompt();
+                        alertTitleEl.textContent = 'Error 1';
+                        alertMessageEl.textContent = 'Support did not understand you! But maybe you need some tips? Then go to telegram: @HintsVirror';
+                        setTimeout(() => {
+                            showErrorAlert();
+                        }, 30);
+                        return;
+                    }
+                    
+                    if (needRestReached) {
+                        closePrompt();
+                        alertTitleEl.textContent = 'Error 1';
+                        alertMessageEl.textContent = 'Support did not understand you! But maybe you need some tips? Then go to telegram: @HintsVirror';
+                        setTimeout(() => {
+                            showErrorAlert();
+                        }, 30);
+                        return;
+                    }
+                    
+                    flowerCount++;
+                    
+                    if (flowerCount === 3) {
+                        needRestReached = true;
+                        updateDisplay();
+                    } else {
+                        updateDisplay();
+                    }
+                    
+                    closePrompt();
+                    
+                } else {
+                    closePrompt();
+                    alertTitleEl.textContent = 'Error 1';
+                    alertMessageEl.textContent = 'Support did not understand you! But maybe you need some tips? Then go to telegram: @HintsVirror';
+                    setTimeout(() => {
+                        showErrorAlert();
+                    }, 30);
+                }
+            });
+
+            flowerSymbol.addEventListener('mousedown', startPress);
+            flowerSymbol.addEventListener('mouseup', endPress);
+            flowerSymbol.addEventListener('mouseleave', endPress);
+            
+            flowerSymbol.addEventListener('touchstart', startPress, { passive: false });
+            flowerSymbol.addEventListener('touchend', endPress);
+            flowerSymbol.addEventListener('touchcancel', endPress);
+
+            resetAllFlower.addEventListener('mousedown', resetAllSequence);
+            resetAllFlower.addEventListener('touchstart', resetAllSequence, { passive: false });
+
+            undoFlower.addEventListener('mousedown', undoLastSound);
+            undoFlower.addEventListener('touchstart', undoLastSound, { passive: false });
+
+            closeErrorBtn.addEventListener('click', closeErrorAlert);
+
+            promptModal.addEventListener('click', function(e) {
+                if (e.target === promptModal) closePrompt();
+            });
+
+            errorModal.addEventListener('click', function(e) {
+                if (e.target === errorModal) closeErrorAlert();
+            });
+
+            inputField.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submitBtn.click();
+                }
+            });
+
+            flowerSymbol.addEventListener('mouseenter', function() {
+                initAudio();
+            }, { once: true });
+            
+            agreeButton.addEventListener('click', function() {
+                if (agreeButton.classList.contains('active') && error10Reached) {
+                    error10Reached = false;
+                    error15Reached = true;
+                    updateDisplay();
+                }
+            });
+            
+            alertCheckbox.addEventListener('change', function() {
+                alertCheckboxChecked = this.checked;
+                if (error10Reached) {
+                    updateAgreeButtonState();
+                }
+            });
+
+        })();
+    </script>
+</body>
+</html>
