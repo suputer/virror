@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Создать бин в JSONBin.io</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 24px;
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        .key-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            font-family: monospace;
+        }
+        .key-input:focus {
+            outline: none;
+            border-color: #007AFF;
+        }
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 14px;
+            width: 100%;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: background 0.2s;
+        }
+        button:active {
+            background: #005bbf;
+            transform: scale(0.98);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #007AFF;
+            word-break: break-all;
+        }
+        .result-title {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .result-content {
+            font-family: monospace;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+        .bin-id {
+            font-size: 20px;
+            color: #007AFF;
+            font-weight: bold;
+        }
+        .error {
+            border-left-color: #ff3b30;
+            color: #ff3b30;
+        }
+        .info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px;
+            padding: 12px;
+            background: #e8f2ff;
+            border-radius: 10px;
+        }
+        .label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Создать новый бин в JSONBin.io</h1>
+        
+        <div class="info">
+            <strong>ℹ️ Как это работает:</strong><br>
+            1. Вставь свой Master Key<br>
+            2. Нажми "Создать бин"<br>
+            3. Получишь ID нового бина<br>
+            4. Используй этот ID в своей доске постов
+        </div>
+        
+        <div class="label">🔑 Твой Master Key:</div>
+        <input type="text" 
+               id="masterKey" 
+               class="key-input" 
+               placeholder="Вставь X-Master-Key сюда"
+               value="$2a$10$hb4J45BDUZhOUBT9XjopxuPaOLq45ciYWk/Cjd/F5zV.yj5F8PJ1G">
+        
+        <div class="label">📝 Начальные данные (JSON):</div>
+        <textarea id="binData" 
+                  class="key-input" 
+                  rows="5"
+                  placeholder='{"posts": []} или []'>[]</textarea>
+        
+        <div class="label">🏷️ Название бина (необязательно):</div>
+        <input type="text" 
+               id="binName" 
+               class="key-input" 
+               placeholder="Моя доска постов">
+        
+        <button id="createBtn">✨ Создать новый бин</button>
+        
+        <div id="result" style="display: none;">
+            <div class="result-title">✅ Результат:</div>
+            <div class="result-content" id="resultContent"></div>
+        </div>
+        
+        <div id="error" style="display: none;">
+            <div class="result-title error">❌ Ошибка:</div>
+            <div class="result-content error" id="errorContent"></div>
+        </div>
+        
+        <div id="instructions" style="display: none;" class="info">
+            <strong>📋 Что дальше:</strong><br>
+            Скопируй ID бина и вставь в свою доску постов вместо BIN_ID
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('createBtn').onclick = async function() {
+            // Получаем значения из полей
+            const masterKey = document.getElementById('masterKey').value.trim();
+            const binData = document.getElementById('binData').value.trim();
+            const binName = document.getElementById('binName').value.trim();
+            
+            // Прячем старые результаты
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('instructions').style.display = 'none';
+            
+            // Проверяем ключ
+            if (!masterKey) {
+                showError('Введи Master Key!');
+                return;
+            }
+            
+            // Проверяем данные
+            if (!binData) {
+                showError('Введи начальные данные!');
+                return;
+            }
+            
+            // Проверяем, что данные - валидный JSON
+            try {
+                JSON.parse(binData);
+            } catch (e) {
+                showError('Некорректный JSON: ' + e.message);
+                return;
+            }
+            
+            // Блокируем кнопку
+            const btn = document.getElementById('createBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Создаю...';
+            
+            try {
+                // Подготавливаем заголовки
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': masterKey
+                };
+                
+                // Добавляем имя если указано
+                if (binName) {
+                    headers['X-Bin-Name'] = binName;
+                }
+                
+                // Делаем запрос на создание бина
+                const response = await fetch('https://api.jsonbin.io/v3/b', {
+                    method: 'POST',
+                    headers: headers,
+                    body: binData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Успех - показываем результат
+                    const resultDiv = document.getElementById('result');
+                    const resultContent = document.getElementById('resultContent');
+                    
+                    // Форматируем красивый вывод
+                    resultContent.innerHTML = `
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #007AFF;">🎉 Бин создан!</strong>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>🆔 BIN_ID (СКОПИРУЙ ЭТО):</strong><br>
+                            <span style="font-size: 24px; color: #007AFF; font-weight: bold;">${data.metadata.id}</span>
+                        </div>
+                        <div style="margin-top: 15px; background: #f0f0f0; padding: 10px; border-radius: 8px;">
+                            <strong>📦 Полный ответ:</strong><br>
+                            <pre style="white-space: pre-wrap; font-size: 12px;">${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                    
+                    resultDiv.style.display = 'block';
+                    
+                    // Показываем инструкции
+                    document.getElementById('instructions').style.display = 'block';
+                    
+                    // Автоматически копируем ID в буфер обмена
+                    try {
+                        await navigator.clipboard.writeText(data.metadata.id);
+                        // Показываем уведомление что скопировано
+                        const notification = document.createElement('div');
+                        notification.style.cssText = `
+                            position: fixed;
+                            bottom: 20px;
+                            left: 20px;
+                            right: 20px;
+                            background: #34c759;
+                            color: white;
+                            padding: 15px;
+                            border-radius: 12px;
+                            text-align: center;
+                            font-weight: bold;
+                            animation: fadeOut 2s forwards;
+                        `;
+                        notification.textContent = '✅ BIN_ID скопирован в буфер обмена!';
+                        document.body.appendChild(notification);
+                        
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 2000);
+                    } catch (clipboardError) {
+                        // Если не получилось скопировать - игнорируем
+                    }
+                    
+                } else {
+                    // Ошибка от API
+                    showError(data.message || 'Неизвестная ошибка');
+                }
+                
+            } catch (error) {
+                showError('Ошибка соединения: ' + error.message);
+            } finally {
+                // Разблокируем кнопку
+                btn.disabled = false;
+                btn.textContent = '✨ Создать новый бин';
+            }
+        };
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            const errorContent = document.getElementById('errorContent');
+            errorContent.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        // Добавляем анимацию для уведомления
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                0% { opacity: 1; }
+                70% { opacity: 1; }
+                100% { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
